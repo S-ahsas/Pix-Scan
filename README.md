@@ -1,0 +1,1 @@
+Pix Scan is a QR code scanner app featuring a custom Material 3 interface designed in Figma. The UI design was created manually, while AI-assisted tools were used to implement the design and develop the app's functionality.
