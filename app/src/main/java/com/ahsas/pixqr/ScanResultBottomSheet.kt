@@ -215,7 +215,7 @@ fun ScanResultBottomSheet(
                 OutlinedButton(
                     onClick = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        clipboard.setPrimaryClip(ClipData.newPlainText("PixQR", cleanedResult))
+                        clipboard.setPrimaryClip(ClipData.newPlainText("Pix Scan", cleanedResult))
                     },
                     modifier = Modifier
                         .weight(1f)

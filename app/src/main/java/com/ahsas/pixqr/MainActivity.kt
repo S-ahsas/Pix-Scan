@@ -51,6 +51,8 @@ fun MainScreen() {
     val scope = rememberCoroutineScope()
     var selectedScan by remember { mutableStateOf<ScanRecord?>(null) }
     var imageScanResult by remember { mutableStateOf<String?>(null) }
+    val emphasizedDecelerate = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1.0f)
+    val emphasizedAccelerate = CubicBezierEasing(0.3f, 0.0f, 0.8f, 0.15f)
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -94,20 +96,22 @@ fun MainScreen() {
         targetState = showScanner && hasCameraPermission,
         transitionSpec = {
             if (targetState) {
+                // Camera opening — slide up with decelerate (entering)
                 slideInVertically(
                     initialOffsetY = { it },
-                    animationSpec = tween(400, easing = EaseOutCubic)
+                    animationSpec = tween(500, easing = emphasizedDecelerate)
                 ) togetherWith slideOutVertically(
                     targetOffsetY = { -it },
-                    animationSpec = tween(400, easing = EaseOutCubic)
+                    animationSpec = tween(200, easing = emphasizedAccelerate)
                 )
             } else {
+                // Going back — slide down with accelerate (exiting)
                 slideInVertically(
                     initialOffsetY = { -it },
-                    animationSpec = tween(400, easing = EaseOutCubic)
+                    animationSpec = tween(500, easing = emphasizedDecelerate)
                 ) togetherWith slideOutVertically(
                     targetOffsetY = { it },
-                    animationSpec = tween(400, easing = EaseOutCubic)
+                    animationSpec = tween(200, easing = emphasizedAccelerate)
                 )
             }
         },
