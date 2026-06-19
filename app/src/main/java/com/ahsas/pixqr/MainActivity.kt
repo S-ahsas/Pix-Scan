@@ -1,59 +1,69 @@
 package com.ahsas.pixqr
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.ahsas.pixqr.ui.theme.PixQRTheme
-import androidx.activity.enableEdgeToEdge
 import kotlinx.coroutines.launch
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Check if launched from Quick Tile
+        val openScannerFromTile = intent?.action == QrScannerTileService.ACTION_OPEN_SCANNER
+
         setContent {
             PixQRTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    MainScreen(openScannerDirectly = openScannerFromTile)
                 }
             }
         }
     }
-}
 
-@Composable
-fun MainScreen() {
-    var hasCameraPermission by remember { mutableStateOf(false) }
-    var showScanner by remember { mutableStateOf(false) }
+    @Composable
+    fun MainScreen(openScannerDirectly: Boolean = false) {
+        var hasCameraPermission by remember { mutableStateOf(false) }
+        var showScanner by remember { mutableStateOf(openScannerDirectly) }
     var showSearch by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
     var scannedResult by remember { mutableStateOf<String?>(null) }
+    var selectedScan by remember { mutableStateOf<ScanRecord?>(null) }
+    var imageScanResult by remember { mutableStateOf<String?>(null) }
+
     val context = androidx.compose.ui.platform.LocalContext.current
     val db = (context.applicationContext as App).database
     val dao = db.scanDao()
     val scope = rememberCoroutineScope()
-    var selectedScan by remember { mutableStateOf<ScanRecord?>(null) }
-    var imageScanResult by remember { mutableStateOf<String?>(null) }
+
     val emphasizedDecelerate = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1.0f)
     val emphasizedAccelerate = CubicBezierEasing(0.3f, 0.0f, 0.8f, 0.15f)
 
+    // Permission launcher — declared before use
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted -> hasCameraPermission = granted }
+
+    LaunchedEffect(Unit) {
+        launcher.launch(Manifest.permission.CAMERA)
+    }
+
+    // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -84,19 +94,17 @@ fun MainScreen() {
         }
     }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted -> hasCameraPermission = granted }
-
-    LaunchedEffect(Unit) {
-        launcher.launch(Manifest.permission.CAMERA)
+    // Settings screen — no animation needed, plain swap
+    if (showSettings) {
+        SettingsScreen(onBack = { showSettings = false })
+        return
     }
 
+    // Camera ↔ History with slide animation
     AnimatedContent(
         targetState = showScanner && hasCameraPermission,
         transitionSpec = {
             if (targetState) {
-                // Camera opening — slide up with decelerate (entering)
                 slideInVertically(
                     initialOffsetY = { it },
                     animationSpec = tween(500, easing = emphasizedDecelerate)
@@ -105,7 +113,6 @@ fun MainScreen() {
                     animationSpec = tween(200, easing = emphasizedAccelerate)
                 )
             } else {
-                // Going back — slide down with accelerate (exiting)
                 slideInVertically(
                     initialOffsetY = { -it },
                     animationSpec = tween(500, easing = emphasizedDecelerate)
@@ -159,7 +166,8 @@ fun MainScreen() {
                 },
                 onSearchClick = { showSearch = true },
                 onItemClick = { scan -> selectedScan = scan },
-                onScanImageClick = { imagePickerLauncher.launch("image/*") }
+                onScanImageClick = { imagePickerLauncher.launch("image/*") },
+                onSettingsClick = { showSettings = true }
             )
 
             selectedScan?.let { scan ->
@@ -168,6 +176,7 @@ fun MainScreen() {
                     onDismiss = { selectedScan = null }
                 )
             }
+
             imageScanResult?.let { result ->
                 ScanResultBottomSheet(
                     rawResult = result,
@@ -176,4 +185,4 @@ fun MainScreen() {
             }
         }
     }
-}
+}}

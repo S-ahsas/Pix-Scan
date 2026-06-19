@@ -43,7 +43,8 @@ fun HistoryScreen(
     onScanClick: () -> Unit,
     onSearchClick: () -> Unit,
     onItemClick: (ScanRecord) -> Unit,
-    onScanImageClick: () -> Unit
+    onScanImageClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
     val context = LocalContext.current
     val db = (context.applicationContext as App).database
@@ -78,7 +79,11 @@ fun HistoryScreen(
         scrimColor = Color.Black.copy(alpha = 0.5f),
         drawerContent = {
             DrawerContent(
-                onClose = { scope.launch { drawerState.close() } }
+                onClose = { scope.launch { drawerState.close() } },
+                onSettingsClick = {
+                    scope.launch { drawerState.close() }
+                    onSettingsClick()
+                }
             )
         }
     ) {
