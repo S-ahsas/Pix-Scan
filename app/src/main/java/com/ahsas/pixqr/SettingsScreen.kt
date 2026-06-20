@@ -19,7 +19,6 @@ import android.app.StatusBarManager
 import android.content.ComponentName
 import android.os.Build
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
@@ -36,11 +35,12 @@ fun SettingsScreen(onBack: () -> Unit) {
             .padding(horizontal = 24.dp)
             .padding(top = 48.dp)
     ) {
-        // Title
+        // Title using Playfair Display to match app typography
         Text(
             text = "Settings",
-            fontSize = 48.sp,
-            fontWeight = FontWeight.Normal,
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Normal
+            ),
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -85,7 +85,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                         scope.launch { userPrefs.setQuickTileEnabled(enabled) }
                         if (enabled) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                val statusBarManager = context.getSystemService(StatusBarManager::class.java)
+                                val statusBarManager =
+                                    context.getSystemService(StatusBarManager::class.java)
                                 statusBarManager.requestAddTileService(
                                     ComponentName(context, QrScannerTileService::class.java),
                                     "Scan QR",
@@ -104,6 +105,30 @@ fun SettingsScreen(onBack: () -> Unit) {
                             }
                         }
                     }
+                )
+
+                SettingsDivider()
+
+                SettingsArrowItem(
+                    icon = Icons.Rounded.Widgets,
+                    title = "Widgets",
+                    onClick = { }
+                )
+
+                SettingsDivider()
+
+                SettingsArrowItem(
+                    icon = Icons.Rounded.SwapVert,
+                    title = "History",
+                    onClick = { }
+                )
+
+                SettingsDivider()
+
+                SettingsArrowItem(
+                    icon = Icons.Rounded.Info,
+                    title = "About",
+                    onClick = { }
                 )
             }
         }

@@ -20,6 +20,7 @@ class QrScannerTileService : TileService() {
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onClick() {
         super.onClick()
+
         val intent = Intent(this, MainActivity::class.java).apply {
             action = ACTION_OPEN_SCANNER
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -27,11 +28,13 @@ class QrScannerTileService : TileService() {
                     Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        startActivityAndCollapse(pendingIntent)
+        unlockAndRun {
+            try {
+                startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     companion object {
