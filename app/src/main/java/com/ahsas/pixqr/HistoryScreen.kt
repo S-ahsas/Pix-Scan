@@ -44,7 +44,8 @@ fun HistoryScreen(
     onSearchClick: () -> Unit,
     onItemClick: (ScanRecord) -> Unit,
     onScanImageClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onGenerateQrClick: () -> Unit
 ) {
     val context = LocalContext.current
     val db = (context.applicationContext as App).database
@@ -83,7 +84,8 @@ fun HistoryScreen(
                 onSettingsClick = {
                     scope.launch { drawerState.close() }
                     onSettingsClick()
-                }
+                },
+                onGenerateQrClick = { onGenerateQrClick() }  // ← add this
             )
         }
     ) {
@@ -98,7 +100,7 @@ fun HistoryScreen(
                         .fillMaxSize()
                         .padding(padding)
                 ) {
-                    // Top bar
+                    // Top bar — surfaceContainerHigh for dark muted look
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -111,7 +113,7 @@ fun HistoryScreen(
                                 .fillMaxWidth()
                                 .height(52.dp),
                             shape = RoundedCornerShape(50),
-                            color = MaterialTheme.colorScheme.primaryContainer
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxSize(),
@@ -123,7 +125,7 @@ fun HistoryScreen(
                                     Icon(
                                         Icons.Rounded.Menu,
                                         contentDescription = "Menu",
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                        tint = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
 
@@ -137,7 +139,7 @@ fun HistoryScreen(
                                     Text(
                                         text = "Search",
                                         style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                     )
                                 }
 
@@ -163,7 +165,7 @@ fun HistoryScreen(
                                         Icon(
                                             imageVector = if (gridView) Icons.Rounded.ViewList else Icons.Rounded.GridView,
                                             contentDescription = "Toggle view",
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            tint = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.size(20.dp)
                                         )
                                     }
@@ -184,13 +186,13 @@ fun HistoryScreen(
                             .padding(top = 8.dp, bottom = 16.dp)
                     )
 
-                    // History container
+                    // History container — surfaceContainer for dark card look
                     Surface(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 12.dp),
                         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer
+                        color = MaterialTheme.colorScheme.surfaceContainer
                     ) {
                         if (scans.isEmpty()) {
                             Box(
@@ -205,17 +207,17 @@ fun HistoryScreen(
                                         Icons.Rounded.QrCodeScanner,
                                         contentDescription = null,
                                         modifier = Modifier.size(56.dp),
-                                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.4f)
+                                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                                     )
                                     Text(
                                         text = "No scans yet",
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                     )
                                     Text(
                                         text = "Tap the button to scan",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.4f)
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                                     )
                                 }
                             }
@@ -252,7 +254,7 @@ fun HistoryScreen(
                                             HistoryItem(scan = scan, onItemClick = onItemClick)
                                             HorizontalDivider(
                                                 modifier = Modifier.padding(start = 72.dp),
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f)
+                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                                             )
                                         }
                                     }
@@ -400,7 +402,7 @@ fun HistoryScreen(
                 }
             }
         }
-    } // ← ModalNavigationDrawer closing brace
+    }
 }
 
 @Composable
@@ -420,7 +422,7 @@ fun HistoryItem(
     ) {
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
             modifier = Modifier.size(40.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -431,7 +433,7 @@ fun HistoryItem(
                         else -> Icons.Rounded.TextSnippet
                     },
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -444,20 +446,20 @@ fun HistoryItem(
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = dateFormat.format(Date(scan.timestamp)),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
         }
 
         Icon(
             Icons.Rounded.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
             modifier = Modifier.size(20.dp)
         )
     }
@@ -475,7 +477,7 @@ fun HistoryGridItem(
             .fillMaxWidth()
             .squishClickable { onItemClick(scan) },
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface
+        color = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -488,7 +490,7 @@ fun HistoryGridItem(
                     else -> Icons.Rounded.TextSnippet
                 },
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.size(20.dp)
             )
 

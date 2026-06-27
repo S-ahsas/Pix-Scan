@@ -264,11 +264,11 @@ fun QrScannerScreen(
                     containerColor = if (isTorchOn)
                         MaterialTheme.colorScheme.primary
                     else
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
                     contentColor = if (isTorchOn)
                         MaterialTheme.colorScheme.onPrimary
                     else
-                        MaterialTheme.colorScheme.onPrimaryContainer
+                        MaterialTheme.colorScheme.onSurface
                 ) {
                     Icon(
                         imageVector = if (isTorchOn) Icons.Rounded.FlashlightOn else Icons.Rounded.FlashlightOff,

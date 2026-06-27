@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
     fun MainScreen(openScannerDirectly: Boolean = false) {
         var hasCameraPermission by remember { mutableStateOf(false) }
         var showScanner by remember { mutableStateOf(openScannerDirectly) }
+        var showGenerateQr by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var scannedResult by remember { mutableStateOf<String?>(null) }
@@ -92,6 +93,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // Add this block right after the showSettings block
+    if (showGenerateQr) {
+            GenerateQrScreen(onBack = { showGenerateQr = false })
+            return
     }
 
     // Settings screen — no animation needed, plain swap
@@ -167,7 +174,8 @@ class MainActivity : ComponentActivity() {
                 onSearchClick = { showSearch = true },
                 onItemClick = { scan -> selectedScan = scan },
                 onScanImageClick = { imagePickerLauncher.launch("image/*") },
-                onSettingsClick = { showSettings = true }
+                onSettingsClick = { showSettings = true },
+                onGenerateQrClick = { showGenerateQr = true }
             )
 
             selectedScan?.let { scan ->

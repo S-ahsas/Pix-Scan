@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun DrawerContent(
     onClose: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onGenerateQrClick: () -> Unit
 ) {
     val context = LocalContext.current
     val userPrefs = remember { UserPreferences(context) }
@@ -166,9 +167,9 @@ fun DrawerContent(
                 onClick = { onClose() },
                 shape = RoundedCornerShape(50),
                 colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    selectedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurface
                 )
             )
 
@@ -205,7 +206,10 @@ fun DrawerContent(
                 icon = { Icon(Icons.Rounded.QrCode2, contentDescription = null) },
                 label = { Text("Generate QR") },
                 selected = false,
-                onClick = { },
+                onClick = {
+                    onClose()
+                    onGenerateQrClick()
+                },
                 shape = RoundedCornerShape(50),
                 colors = NavigationDrawerItemDefaults.colors(
                     unselectedContainerColor = MaterialTheme.colorScheme.surface
